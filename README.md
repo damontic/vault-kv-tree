@@ -1,6 +1,13 @@
 # vault-kv-tree
 Shows Hashicorp Vault kv secrets (v2) as a tree
 
+## Install
+
+```bash
+$ go get github.com/damontic/vault-kv-tree
+$ go install github.com/damontic/vault-kv-tree
+```
+
 ## Usage
 
 1. Export both VAULT_ADDR and VAULT_TOKEN
