@@ -10,6 +10,8 @@ $ go install github.com/damontic/vault-kv-tree
 
 ## Usage
 
+### List kv secrets
+
 1. Export both VAULT_ADDR and VAULT_TOKEN
 
 2. Execute
@@ -33,5 +35,35 @@ $ go install github.com/damontic/vault-kv-tree
        └── anchore
    
    6 paths, 9 secrets
+   ```
+
+### List policies
+
+1. Export both VAULT_ADDR and VAULT_TOKEN
+
+2. Execute
+
+   ```bash
+   $ vault-kv-tree -subcommand policy
+   sys/policy
+   ├── default
+   └── root
+   
+   0 paths, 2 policies
+   ```
+
+### List kubernetes authentication roles
+
+1. Export both VAULT_ADDR and VAULT_TOKEN
+
+2. Execute
+
+   ```bash
+   $ vault-kv-tree -subcommand kroles -kubernetes kubernetes-prod
+   auth/kubernetes-prod/role
+   ├── another-k-role
+   └── secrets-read-role
+   
+   0 paths, 2 kroles
    ```
 
