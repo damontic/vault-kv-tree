@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -13,6 +14,7 @@ import (
 type counter struct {
 	dirs    int
 	secrets int
+	name    string
 }
 
 func (counter *counter) index(path string) {
@@ -24,7 +26,7 @@ func (counter *counter) index(path string) {
 }
 
 func (counter *counter) output() string {
-	return fmt.Sprintf("\n%d paths, %d secrets", counter.dirs, counter.secrets)
+	return fmt.Sprintf("\n%d paths, %d %s", counter.dirs, counter.secrets, counter.name)
 }
 
 func dirnamesFrom(base string, logical *vault.Logical) []string {
@@ -77,6 +79,10 @@ func main() {
 		log.Fatalln("err: VAULT_ADDR not defined")
 	}
 
+	subcommand := flag.String("subcommand", "kv", "Specify the object to query. Options are: kv, policy and kroles. kv by default")
+	kubernetesCluster := flag.String("kubernetes", "kubernetes", "Specify the kubernetes integration name for kroles. kubernetes by default")
+	flag.Parse()
+
 	config := vault.DefaultConfig()
 	config.Address = vaultServerEndpoint
 
@@ -85,10 +91,24 @@ func main() {
 		log.Fatalf("err: %s", err)
 	}
 
+	var directory string
+	var elementName string
 	logical := client.Logical()
-	directory := "kv/metadata/"
+	switch *subcommand {
+	case "policy":
+		directory = "sys/policy/"
+		elementName = "policies"
+	case "kroles":
+		directory = fmt.Sprintf("auth/%s/role/", *kubernetesCluster)
+		elementName = "kroles"
+	default:
+		directory = "kv/metadata/"
+		elementName = "secrets"
+	}
 
-	counter := new(counter)
+	counter := &counter{
+		name: elementName,
+	}
 	fmt.Println(strings.TrimSuffix(directory, "/"))
 
 	tree(counter, directory, "", logical)
